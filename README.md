@@ -1,5 +1,5 @@
 # quncloud
-基于graia的一个词云生成器
+基于graia的一个qq群词云生成器
 
 ## 依赖安装
 
