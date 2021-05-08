@@ -15,52 +15,36 @@ class qunCloud:
         info = msgText.split()
         op = info[1]
         arg = list(map(lambda x: int(x), info[2:]))
-        print(*arg,op)
-        result = {
-            '日期': self.selectDay,
-            '月份': self.selectMonth,
-            '年份': self.selectYear,
-            '精确': self.selectData,
+        argDict = {
+            '年份': (arg[0], 0),
+            '月份': ((0, arg[0]), 1),
+            '日期': ((0, 0, arg[0]), 2),
         }
-        return result[op](*arg)
+        args = argDict[op]
+        return self.selectLastTime[op](*(args[0]), timeType=args[1])
 
 
     def selectData(self, year=-1, month=-1, day=-1):
-        print(self.data)
-        tupleTime = year, month, day
+        timeTuple = year, month, day
         if year == -1:
-            data = self.selectMonth()
+            data = self.selectLastTime(0, timeType=0)
         elif month == -1:
-            data = filter(lambda x: x[1][0] == year)
+            data = filter(lambda x: x[1][0] == year, self.data)
         elif day == -1:
-            data = filter(lambda x: x[1][:2] == tupleTime[:2], self.data)
+            data = filter(lambda x: x[1][:2] == timeTuple[:2], self.data)
         else:
-            data = filter(lambda x: x[1] == tupleTime, self.data)
+            data = filter(lambda x: x[1] == timeTuple, self.data)
         data = map(lambda x: x[0], data)
-        
         return ' '.join(data)
 
     def addStopWords(self, words):
         open('./res/userstopwords.txt', 'a').writelines(words)
 
-    def selectDay(self, dayCnt=0):
+    def selectLastTime(self, yearCnt, monthCnt, dayCnt, timeType):
         now = arrow.now()
-        lastTime = now.shift(days=-dayCnt)
-        data = filter(lambda x: x[1][2] == lastTime.day, self.data)
-        data = map(lambda x: x[0], data)
-        return ' '.join(data)
-
-    def selectMonth(self, monthCnt=0):
-        now = arrow.now()
-        lastTime = now.shift(months=-monthCnt)
-        data = filter(lambda x: x[1][1] == lastTime.month, self.data)
-        data = map(lambda x: x[0], data)
-        return ' '.join(data)
-
-    def selectYear(self, yearCnt=0):
-        now = arrow.now()
-        lastTime = now.shift(years=-yearCnt)
-        data = filter(lambda x: x[1][0] == lastTime.year, self.data)
+        lastTime = now.shift(years=-yearCnt, months=-monthCnt, days=-dayCnt)
+        timeTuple = lastTime.year, lastTime.month, lastTime.day
+        data = filter(lambda x: x[1][timeType] == timeTuple[timeType], self.data)
         data = map(lambda x: x[0], data)
         return ' '.join(data)
 
