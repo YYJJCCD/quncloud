@@ -18,13 +18,16 @@ bcc = Broadcast(loop=loop)
 app = GraiaMiraiApplication(
     broadcast=bcc,
     connect_info=Session(
-        host='',  # 填入 httpapi 服务运行的地址
-        authKey='',  # 填入 authKey
-        account=123456,  # 你的机器人的 qq 号
-        websocket=True  # Graia 已经可以根据所配置的消息接收的方式来保证消息接收部分的正常运作.
+        host="",
+        authKey="",
+        account=123456,
+        websocket=True  
     )
 )
 inc = InterruptControl(bcc)
+
+adminId = 123456
+
 @bcc.receiver("GroupMessage")
 async def group_message_handler(
         message: MessageChain,
@@ -41,7 +44,11 @@ async def group_message_handler(
                 At(member.id), Image.fromLocalFile('./res/1.png')
             ]))
         else:
-            cloud.addStopWords(msgText.split()[2:])
+            words = msgText.split()[2:]
+            if member.id == adminId and words[0] == '全局':
+                cloud.addGlobalStopWords(words[1:])
+            else:
+                cloud.addQunStopWords(words)
             await app.sendGroupMessage(group, MessageChain.create([
                 At(member.id), Plain('屏蔽词添加成功\n' + str((msgText.split()[2:])))
             ]))
@@ -49,13 +56,6 @@ async def group_message_handler(
         qqid = member.id
         qunid = group.id
         sendtime = int(time.time())
-        db = wordDB()
-        if msgText.startswith('/s'):
-            data = str(db.select(qunid))
-            await app.sendGroupMessage(group, MessageChain.create([
-                At(member.id), Plain(data)
-            ]))
-        else:
-            db.insertvalue(msgText, qqid, qunid, sendtime)
+        wordDB().insertvalue(msgText, qqid, qunid, sendtime)
 
 app.launch_blocking()
