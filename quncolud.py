@@ -45,11 +45,11 @@ class qunCloud:
 
     def addQunStopWords(self, words):
         with open('./res/%s_stopwords.txt' % self.qunid, 'a', encoding='utf8') as f:
-            f.write('\n'.join(words))
+            f.write('\n' + '\n'.join(words))
 
     def addGlobalStopWords(self, words):
-        with open('./res/stopwords.txt' % self.qunid, 'a', encoding='utf8') as f:
-            f.write('\n'.join(words))
+        with open('./res/stopwords.txt', 'a', encoding='utf8') as f:
+            f.write('\n' + '\n'.join(words))
 
     def selectLastTime(self, yearCnt=0, monthCnt=0, dayCnt=0, timeType=0):
         now = arrow.now()
@@ -65,6 +65,7 @@ class qunCloud:
         default_mode = jieba.cut(data, cut_all=False)
         default_mode = list(filter(lambda x: len(x) > 1, default_mode))
         text = ' '.join(default_mode)
+
         alice_mask = np.array(Image.open('./res/a.png'))
         cnStopWords = set(map(str.strip, open('./res/stopwords.txt', encoding='utf8').readlines()))
         if not os.path.exists('./res/%s_stopwords.txt' % self.qunid):
