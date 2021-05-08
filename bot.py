@@ -34,11 +34,17 @@ async def group_message_handler(
     msgText = message.asDisplay()
     if msgText.startswith('/云图'):
         cloud = qunCloud(group.id)
-        data = cloud.getData(msgText)
-        cloud.solve(data)
-        await app.sendGroupMessage(group, MessageChain.create([
-            At(member.id), Image.fromLocalFile('./res/1.png')
-        ]))
+        if msgText.split()[1] != '屏蔽词':
+            data = cloud.getData(msgText)
+            cloud.solve(data)
+            await app.sendGroupMessage(group, MessageChain.create([
+                At(member.id), Image.fromLocalFile('./res/1.png')
+            ]))
+        else:
+            cloud.addStopWords(msgText.split()[2:])
+            await app.sendGroupMessage(group, MessageChain.create([
+                At(member.id), Plain('屏蔽词添加成功\n' + str((msgText.split()[2:])))
+            ]))
     else:
         qqid = member.id
         qunid = group.id
