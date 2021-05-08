@@ -20,40 +20,45 @@ class qunCloud:
             '日期': self.selectDay,
             '月份': self.selectMonth,
             '年份': self.selectYear,
-            '精确': self.selectData
+            '精确': self.selectData,
         }
         return result[op](*arg)
 
 
-    def selectData(self, yearCnt=0, monthCnt=0, dayCnt=0):
-        print(dayCnt)
+    def selectData(self, year, month=-1, day=-1):
         print(self.data)
-        now = arrow.now()
-        lastTime = now.shift(years=-yearCnt, months=-monthCnt, days=-dayCnt)
-        tupleTime = lastTime.year, lastTime.month,  lastTime.day
-        data = filter(lambda x: x[1] == tupleTime and x[0] != '[图片]', self.data)
+        tupleTime = year, month, day
+        if month == -1:
+            data = filter(lambda x: x[1][0] == year)
+        elif day == -1:
+            data = filter(lambda x: x[1][:2] == tupleTime[:2], self.data)
+        else:
+            data = filter(lambda x: x[1] == tupleTime, self.data)
         data = map(lambda x: x[0], data)
         
         return ' '.join(data)
-    
+
+    def addStopWords(self, words):
+        open('./res/userstopwords.txt', 'a').writelines(words)
+
     def selectDay(self, dayCnt=0):
         now = arrow.now()
         lastTime = now.shift(days=-dayCnt)
-        data = filter(lambda x: x[1][2] == lastTime.day and x[0] != '[图片]', self.data)
+        data = filter(lambda x: x[1][2] == lastTime.day, self.data)
         data = map(lambda x: x[0], data)
         return ' '.join(data)
 
     def selectMonth(self, monthCnt=0):
         now = arrow.now()
         lastTime = now.shift(months=-monthCnt)
-        data = filter(lambda x: x[1][1] == lastTime.month and x[0] != '[图片]', self.data)
+        data = filter(lambda x: x[1][1] == lastTime.month, self.data)
         data = map(lambda x: x[0], data)
         return ' '.join(data)
 
     def selectYear(self, yearCnt=0):
         now = arrow.now()
         lastTime = now.shift(years=-yearCnt)
-        data = filter(lambda x: x[1][0] == lastTime.year and x[0] != '[图片]', self.data)
+        data = filter(lambda x: x[1][0] == lastTime.year, self.data)
         data = map(lambda x: x[0], data)
         return ' '.join(data)
 
