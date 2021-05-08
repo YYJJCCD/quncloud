@@ -25,10 +25,12 @@ class qunCloud:
         return result[op](*arg)
 
 
-    def selectData(self, year, month=-1, day=-1):
+    def selectData(self, year=-1, month=-1, day=-1):
         print(self.data)
         tupleTime = year, month, day
-        if month == -1:
+        if year == -1:
+            data = self.selectMonth()
+        elif month == -1:
             data = filter(lambda x: x[1][0] == year)
         elif day == -1:
             data = filter(lambda x: x[1][:2] == tupleTime[:2], self.data)
