@@ -41,7 +41,7 @@ class qunCloud:
         return ' '.join(data)
 
     def addStopWords(self, words):
-        open('./res/userstopwords.txt', 'a', encoding='utf8').write('\n'.join(words))
+        open('./res/%suserstopwords.txt' % self.qunid, 'a', encoding='utf8').write('\n'.join(words))
 
     def selectLastTime(self, yearCnt=0, monthCnt=0, dayCnt=0, timeType=0):
         now = arrow.now()
@@ -57,7 +57,7 @@ class qunCloud:
         text = ' '.join(default_mode)
         alice_mask = np.array(Image.open('./res/a.png'))
         cnStopWords = set(map(str.strip, open('./res/stopwords.txt', encoding='utf8').readlines()))
-        userStopWords = set(map(str.strip, open('./res/userstopwords.txt', encoding='utf8').readlines()))
+        userStopWords = set(map(str.strip, open('./res/%s_userstopwords.txt' % self.qunid , encoding='utf8').readlines()))
         stopwords = STOPWORDS|cnStopWords|userStopWords
         wc = WordCloud(
             font_path=r'./font/simhei.ttf',
