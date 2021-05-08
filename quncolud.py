@@ -14,18 +14,21 @@ class qunCloud:
     def getData(self, msgText):
         info = msgText.split()
         op = info[1]
-        arg = list(map(lambda x: int(x), info[2:]))
+        args = list(map(lambda x: int(x), info[2:]))
         argDict = {
-            '年份': (arg[0], 0),
-            '月份': ((0, arg[0]), 1),
-            '日期': ((0, 0, arg[0]), 2),
+            '年份': (args[0], 0),
+            '月份': ((0, args[0]), 1),
+            '日期': ((0, 0, args[0]), 2),
         }
+        if op == '精确':
+            return self.selectDate(*args)
         args = argDict[op]
-        return self.selectLastTime[op](*(args[0]), timeType=args[1])
+        return self.selectLastTime(*(args[0]), timeType=args[1])
 
 
-    def selectData(self, year=-1, month=-1, day=-1):
+    def selectDate(self, year=-1, month=-1, day=-1):
         timeTuple = year, month, day
+        print(year, month, day)
         if year == -1:
             data = self.selectLastTime(0, timeType=0)
         elif month == -1:
@@ -38,9 +41,9 @@ class qunCloud:
         return ' '.join(data)
 
     def addStopWords(self, words):
-        open('./res/userstopwords.txt', 'a').writelines(words)
+        open('./res/userstopwords.txt', 'a', encoding='utf8').write('\n'.join(words))
 
-    def selectLastTime(self, yearCnt, monthCnt, dayCnt, timeType):
+    def selectLastTime(self, yearCnt=0, monthCnt=0, dayCnt=0, timeType=0):
         now = arrow.now()
         lastTime = now.shift(years=-yearCnt, months=-monthCnt, days=-dayCnt)
         timeTuple = lastTime.year, lastTime.month, lastTime.day
@@ -54,7 +57,8 @@ class qunCloud:
         text = ' '.join(default_mode)
         alice_mask = np.array(Image.open('./res/a.png'))
         cnStopWords = set(map(str.strip, open('./res/stopwords.txt', encoding='utf8').readlines()))
-        stopwords = STOPWORDS|cnStopWords
+        userStopWords = set(map(str.strip, open('./res/userstopwords.txt', encoding='utf8').readlines()))
+        stopwords = STOPWORDS|cnStopWords|userStopWords
         wc = WordCloud(
             font_path=r'./font/simhei.ttf',
             background_color="white",
